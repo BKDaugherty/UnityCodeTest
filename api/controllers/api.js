@@ -156,7 +156,7 @@ const requestProject = function(req, res){
     } else {
       if(LOG_MODE)
         console.log(`Project query successful. Sending client 200 ok and Project with id ${selectedProject.id}`)
-      return res.status(200).json( {
+      return res.status(200).json({
         "projectName":selectedProject.projectName,
         "projectCost":selectedProject.projectCost,
         "projectUrl":selectedProject.projectUrl
