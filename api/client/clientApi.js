@@ -7,7 +7,23 @@ const createProject = function(projectBodyData){
 }
 
 const requestProject = function(projectID, country, number, keyword){
-  const url = baseURL + `/requestProject?projectid=${projectID}&country=${country}&number=${number}&keyword=${keyword}`
+
+  let queryString = "/requestProject?"
+
+  if(projectID){
+    queryString += `projectid=${projectID}&`
+  }
+  if(country){
+    queryString +=  `country=${country}&`
+  }
+  if(number){
+    queryString += `number=${number}&`
+  }
+  if(keyword){
+    queryString += `keyword=${keyword}`
+  }
+
+  const url = baseURL + queryString
   return request.get(url)
 }
 
