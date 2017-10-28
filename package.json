@@ -1,0 +1,30 @@
+{
+  "name": "unitycodetest",
+  "version": "1.0.0",
+  "description": "Code test for Unity interview",
+  "main": "server.js",
+  "dependencies": {
+    "chai": "^4.1.2",
+    "express": "^4.16.2",
+    "mochawesome": "^2.3.1",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
+  },
+  "devDependencies": {
+    "mocha": "^4.0.1"
+  },
+  "scripts": {
+    "test": "mocha",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BKDaugherty/UnityCodeTest.git"
+  },
+  "author": "Brendon Kyle Daugherty",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BKDaugherty/UnityCodeTest/issues"
+  },
+  "homepage": "https://github.com/BKDaugherty/UnityCodeTest#readme"
+}
