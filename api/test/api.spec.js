@@ -1,5 +1,7 @@
 //Required modules
-const dummyClient = require("../client/clientApi.js")
+const dummyClient = require("../client/clientApi.js") //Used to simulate REST requests
+const request = require("request-promise") //Used for more freedom in REST requests
+//Utility functionalities
 const util = require("./utility.js")
 const common = require('../common/utility')
 
@@ -8,6 +10,7 @@ const expect = require("chai").expect
 const mocha = require("mocha")
 
 
+//Wrapper function for successful id requests
 const testIDRequest = function(query, project){
   return dummyClient.requestProject(query)
   .then(message => {
@@ -19,6 +22,8 @@ const testIDRequest = function(query, project){
 }
 
 
+//Mocha is used as a Test framework, and is meant to be as descriptive as possible!
+//Group subsections in describe blocks, each it is a test case.
 describe("Testing Framework", function(){
   describe("CreateProject", function(){
     describe("Positive Tests", function(){
@@ -129,6 +134,7 @@ describe("Testing Framework", function(){
 
           //Setup environment
           before(function(){
+            //Create all projects and return promises
             const projectsToCreate = [util.generateRandomProject({id:1, projectName:"1", enabled:false}),
               util.generateRandomProject({id:2, projectName:"2", projectCost:7000, targetCountries:["GB"], targetKeys:[{number:500, keyword:"HelloWorld"}], enabled:true}),
                util.generateRandomProject({id:3,projectName:"3", projectCost:5000, enabled:true}),
@@ -205,9 +211,13 @@ describe("Testing Framework", function(){
           })
         })
       })
+    })
+    describe("Negative Tests", function(){
+      describe("Invalid Parameters", function(){
+        it("Should ignore bad params", function(){
+          return request
+        })
+      })
+    })
   })
-  describe("Negative Tests", function(){
-
-  })
-})
 })
