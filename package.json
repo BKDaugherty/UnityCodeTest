@@ -15,7 +15,7 @@
   },
   "scripts": {
     "test": "mocha api/test/api.spec.js --reporter=mochawesome --reporter-options reportDir=./reports,reportFilename=UnityCodeTestReport",
-    "start": "node server.js"
+    "start": "LOG_MODE=true node server.js"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,5 @@
 //Required modules
 const dummyClient = require("../client/clientApi.js") //Used to simulate REST requests
-const request = require("request-promise") //Used for more freedom in REST requests
 //Utility functionalities
 const util = require("./utility.js")
 const common = require('../common/utility')
@@ -8,6 +7,11 @@ const common = require('../common/utility')
 //Testing framework used
 const expect = require("chai").expect
 const mocha = require("mocha")
+
+const request = require("request-promise") //Used for more freedom in REST requests
+const port = process.env.port || 7846
+const baseURL = "http://localhost:" + port
+
 
 
 //Wrapper function for successful id requests
@@ -50,9 +54,23 @@ describe("Testing Framework", function(){
       })
     })
     describe("Negative Tests", function(){
+      describe("Invalid URL", function(){
+        it("Attempt to post to an invalid URL returns 404", function(){
+          const proj = util.generateRandomProject()
+          return request.post({url:baseURL + "/requestProject", json:proj}).catch(err => {
+            expect(err.statusCode).to.equal(404)
+          })
+        })
+      })
+
       describe("Attempt to create an invalid project", function(){
         it("Empty body should be rejected", function(){
           return dummyClient.createProject(null).catch(err => {
+            expect(err.statusCode).to.equal(400)
+          })
+        })
+        it("Body that isn't a JSON should be rejected", function(){
+          return dummyClient.createProject("Hello").catch(err => {
             expect(err.statusCode).to.equal(400)
           })
         })
@@ -213,9 +231,39 @@ describe("Testing Framework", function(){
       })
     })
     describe("Negative Tests", function(){
+      describe("Invalid URL", function(){
+        it("Attempt to GET anything other than requestProject returns 404", function(){
+          return request.get(baseURL + "/requstProject?").catch(err => {
+            expect(err.statusCode).to.equal(404)
+          })
+        })
+        it("Attempt to GET createProject returns 404", function(){
+          return request.get(baseURL + "/createProject").catch(err => {
+            expect(err.statusCode).to.equal(404)
+          })
+        })
+      })
       describe("Invalid Parameters", function(){
+        it("Should take empty query to be standard", function(){
+          return request.get(baseURL + "/requestProject").then(message => {
+            message = JSON.parse(message)
+            expect(message.projectName).to.equal("5")
+          })
+        })
+        it("Should ignore invalid params", function(){
+          return request.get(baseURL + "/requestProject?apple=cheese&triangle=square")
+        })
         it("Should ignore bad params", function(){
-          return request
+          return request.get(baseURL + "/requestProject?projectid=null&keyword=HelloWorld").then(message => {
+            message = JSON.parse(message)
+            expect(message.message).to.equal("no project found")
+          })
+        })
+        it("Should not find a project with id ${true}", function(){
+          return request.get(baseURL + "/requestProject?projectid=${true}").then(message => {
+            message = JSON.parse(message)
+            expect(message.message).to.equal("no project found")
+          })
         })
       })
     })

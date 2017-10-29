@@ -4,7 +4,7 @@ const fs = require('fs') //Used to write to txt file
 const projectTextFile = "projects.txt" //place to store data
 const util = require('./utility.js') //Holder for utility functions
 const common = require('../common/utility') //Holder for utility functions common to multiple modules
-const LOG_MODE = process.env.LOG_MODE || true
+const LOG_MODE = process.env.LOG_MODE //Used to turn logging on or off!
 
 //Will run on createProject POST request
 const createProject = function(req, res){
