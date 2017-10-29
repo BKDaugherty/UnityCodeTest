@@ -2,25 +2,30 @@ const request = require("request-promise")
 const port = process.env.port || 7846
 const baseURL = "http://localhost:" + port
 
+//Clientside API built to use in testing framework
+
 const createProject = function(projectBodyData){
   return request.post({url:baseURL + "/createProject",  json:projectBodyData})
 }
 
-const requestProject = function(projectID, country, number, keyword){
+const requestProject = function(query){
 
   let queryString = "/requestProject?"
 
-  if(projectID){
-    queryString += `projectid=${projectID}&`
+  if(!query)
+    query = {}
+
+  if(query.projectid){
+    queryString += `projectid=${query.projectid}&`
   }
-  if(country){
-    queryString +=  `country=${country}&`
+  if(query.country){
+    queryString +=  `country=${query.country}&`
   }
-  if(number){
-    queryString += `number=${number}&`
+  if(query.number){
+    queryString += `number=${query.number}&`
   }
-  if(keyword){
-    queryString += `keyword=${keyword}`
+  if(query.keyword){
+    queryString += `keyword=${query.keyword}`
   }
 
   const url = baseURL + queryString

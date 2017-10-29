@@ -1,3 +1,8 @@
+const fs = require('fs')
+const projectTextFile = "projects.txt"
+
+//Common functions required in modules
+
 const padLeft = function(str){
   if(str.length == 1){
     return "0" + str
@@ -14,7 +19,7 @@ const parseDateFormat = function (d){
 
 const sendToDateFormat = function(d){
   const month = padLeft((d.getMonth() + 1).toString())
-  const day = padLeft(d.getDay().toString())
+  const day = padLeft(d.getDate().toString())
   const year = d.getFullYear()
 
   const hour = padLeft(d.getHours().toString())
@@ -25,7 +30,29 @@ const sendToDateFormat = function(d){
   return dateString
 }
 
+//Returns a promise
+const clearDatabase = function(){
+  return new Promise(function(resolve, reject){
+    fs.unlink(projectTextFile, function(err){
+      if(err) return reject(err)
+      resolve()
+    })
+  })
+}
+
+const writeToDB = function(stuffToWrite){
+  console.log("attempt write")
+  return new Promise(function(resolve, reject){
+    fs.appendFile(projectTextFile, JSON.stringify(stuffToWrite) + '\n', function(err){
+      if(err) return reject(err)
+      resolve()
+    })
+  })
+}
+
 module.exports = {
   parseDateFormat,
-  sendToDateFormat
+  sendToDateFormat,
+  clearDatabase,
+  writeToDB
 }

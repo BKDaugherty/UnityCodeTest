@@ -1,9 +1,13 @@
-//Validates the input
+//Validates the input of the post request
 //Returns true on a valid project post data
 const validateProjectPostData = function(projectPostData){
   const validParams =
   ["id", "projectName", "creationDate", "expiryDate", "enabled",
    "targetCountries", "projectCost", "projectUrl", "targetKeys"]
+
+   if(Object.keys(projectPostData).length < validParams.length){
+     return false
+   }
 
    for(let paramName in projectPostData){
      if(!validParams.includes(paramName)){
@@ -12,18 +16,6 @@ const validateProjectPostData = function(projectPostData){
    }
 
    return true
-  // const ProjectID = projectPostData.id && typeof(projectPostData.id) == "number"
-  // const ProjectName = projectPostData.projectName && typeof(projectPostData.projectName) == "string"
-  // const CreationDate = projectPostData.creationDate && typeof(projectPostData.creationDate) == "string"
-  // const ExpiryDate = projectPostData.expiryDate && typeof(projectPostData.expiryDate) == "string"
-  // const Enabled = projectPostData.enabled == true || projectPostData.enabled == false
-  // const TargetCountries = projectPostData.targetCountries && typeof(projectPostData.targetCountries) == "object"
-  // const ProjectCost = projectPostData.projectCost && typeof(projectPostData.projectCost) == "number"
-  // const ProjectURL = projectPostData.projectUrl && typeof(projectPostData.projectUrl) == "string"
-  // const TargetKeys = projectPostData.targetKeys && typeof(projectPostData.targetKeys) == "object"
-
-  return ProjectID && ProjectName && CreationDate && ExpiryDate && TargetCountries && ProjectCost && ProjectURL && TargetKeys
-
 }
 
 module.exports = {

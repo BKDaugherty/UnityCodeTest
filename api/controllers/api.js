@@ -1,16 +1,20 @@
-const fs = require('fs')
-const projectTextFile = "projects.txt"
-const util = require('./utility.js')
-const common = require('../common/utility')
+//Defines the main functionality of the REST service
+
+const fs = require('fs') //Used to write to txt file
+const projectTextFile = "projects.txt" //place to store data
+const util = require('./utility.js') //Holder for utility functions
+const common = require('../common/utility') //Holder for utility functions common to multiple modules
 const LOG_MODE = process.env.LOG_MODE || true
+
 //Will run on createProject POST request
 const createProject = function(req, res){
   //Receives the body of the request in req.body
-
+  //Attempt to validate
   if(util.validateProjectPostData(req.body)){
     if(LOG_MODE)
       console.log("Request Body successfully validated")
 
+    //On validation, write body to file
     fs.appendFile(projectTextFile, JSON.stringify(req.body) + '\n', (err) => {
       if(err){
         if(LOG_MODE)
@@ -24,7 +28,7 @@ const createProject = function(req, res){
           console.log("Successful post. Sending 200 ok to client")
         }
 
-        //Send response to client
+        //Send success response to client
         return res.status(200)
           .json({
               message:"campaign is successfully created"
@@ -34,11 +38,12 @@ const createProject = function(req, res){
   } else {
     if(LOG_MODE)
       console.log("Unable to create project due to bad input. Sending client code 400")
+    //Unable to create, send failure to client
     return res.status(400).send("Unable to create resource")
   }
 }
 
-//Will run on requestProject GET request
+//Used to load the projects from the txt file
 const loadProjects = function(callback){
   fs.readFile(projectTextFile,"utf-8", (err, data) => {
     if(err) {
@@ -54,13 +59,6 @@ const loadProjects = function(callback){
   })
 }
 
-//Query Params
-/*
- * projectid
- * country
- * number
- * keyword
- */
 
  const findHighestCost = function(projectList){
    return projectList.reduce(function(prev, current){
@@ -83,12 +81,18 @@ const selectProjectById = function(projectid, projectList){
       return null
 }
 
+
+
+//Implements selection rules to choose project based on query
+//Uses map, filter and reduce as methods to functionally find the
+//item we are searching for
  const selectProject = function(query, projectList){
-   //"If sent in request then should always return the project with matching id
-   //regardless of any other rule.
+   //If ID is present, disregard all other rules
    if(query.projectid){
      return selectProjectById(query.projectid, projectList)
   } else {
+    if(LOG_MODE)
+      console.log("FILTERING BY QUERY")
     //Filter projects for expiration date, projectUrl, and enabled==true
     const currentTime = new Date()
     projectList = projectList.filter(elem => {
@@ -99,28 +103,50 @@ const selectProjectById = function(projectid, projectList){
       return (projUrl != null && projUrl != undefined) && (expireDate > currentTime) && enabled
     })
 
+    if(LOG_MODE){
+      console.log("AFTER GENERAL")
+      console.log(projectList)
+    }
+
     //Filter for country query
     if(query.country){
       projectList = projectList.filter(elem => {
-        elem.targetCountries.includes(query.country)
+        return elem.targetCountries.includes(query.country)
       })
+    }
+
+
+    if(LOG_MODE) {
+      console.log("COUNTRY AFTER")
+      console.log(projectList)
     }
 
     //Filter for number query
     if(query.number){
       projectList = projectList.filter(elem => {
         return (elem.targetKeys.find(obj => {
-          obj.number >= query.number
+          return (obj.number >= query.number)
         }) != undefined)
       })
     }
 
+    if(LOG_MODE){
+      console.log("NUMBER AFTER")
+      console.log(projectList)
+    }
+
+    //Filter for keyword query
     if(query.keyword){
       projectList = projectList.filter(elem => {
         return (elem.targetKeys.find(obj => {
-          obj.keyword == query.keyword
+          return obj.keyword === query.keyword
         }) != undefined)
       })
+    }
+
+    if(LOG_MODE){
+      console.log("KEYWORD AFTER")
+      console.log(projectList)
     }
 
     //If there are one or greater elements can use reduction, otherwise return null
@@ -133,6 +159,14 @@ const selectProjectById = function(projectid, projectList){
   }
  }
 
+
+//Runs on requestProject endpoint
+/* Query Params
+ * projectid
+ * country
+ * number
+ * keyword
+ */
 const requestProject = function(req, res){
 
   const projectId = req.query.projectid
@@ -146,16 +180,18 @@ const requestProject = function(req, res){
   //Choose project to return
   const selectedProject = selectProject(req.query, projectList)
 
-    //Reply with project
+    //Reply with selected project
     if(!selectedProject){
       if(LOG_MODE)
         console.log("No project found. Relaying to client")
+      //No project, send no project found message
       return res.status(200).json({
         message:"no project found"
       })
     } else {
       if(LOG_MODE)
         console.log(`Project query successful. Sending client 200 ok and Project with id ${selectedProject.id}`)
+      //Found project, successful reply
       return res.status(200).json({
         "projectName":selectedProject.projectName,
         "projectCost":selectedProject.projectCost,
